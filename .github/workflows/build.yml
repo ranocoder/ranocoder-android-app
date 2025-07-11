@@ -22,14 +22,14 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '16'
-        
+
     - name: Set up Android SDK and Accept Licenses
       uses: android-actions/setup-android@v3
       with:
         packages: "platforms;android-32 build-tools;32.0.0"
         accept-android-sdk-licenses: true
 
-    - name: Install Cordova and Build App Bundle
+    - name: Install Cordova and Prepare Project
       run: |
         npm install -g cordova
         cordova create temp_build
@@ -37,7 +37,11 @@ jobs:
         cp -r ../www/* www/
         cp ../config.xml .
         cordova platform add android@11
-        cordova build android --release -- --packageType=bundle --minSdkVersion=22
+
+    - name: Build App Bundle with Gradle
+      run: |
+        cd temp_build/platforms/android
+        ./gradlew bundleRelease
 
     - name: List bundle output (Debug Step)
       run: ls -R temp_build/platforms/android/app/build/outputs/bundle/release
