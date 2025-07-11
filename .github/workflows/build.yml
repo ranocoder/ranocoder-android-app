@@ -37,12 +37,13 @@ jobs:
         cp -r ../www/* www/
         cp ../config.xml .
         cordova platform add android@11
-        # The --packageType=apk flag is REMOVED to build a bundle by default
-        cordova build android --release -- --minSdkVersion 22
+        cordova build android --release -- --packageType=bundle --minSdkVersion=22
+
+    - name: List bundle output (Debug Step)
+      run: ls -R temp_build/platforms/android/app/build/outputs/bundle/release
 
     - name: Upload App Bundle
       uses: actions/upload-artifact@v4
       with:
         name: app-bundle-release
-        # The path is set to find the .aab file
         path: temp_build/platforms/android/app/build/outputs/bundle/release/*.aab
