@@ -1,4 +1,4 @@
-name: Build Android APK (DEBUGGING)
+name: Build Android App Bundle (AAB)
 
 on:
   push:
@@ -29,24 +29,20 @@ jobs:
         packages: "platforms;android-32 build-tools;32.0.0"
         accept-android-sdk-licenses: true
 
-    - name: Install, Build, and Debug
+    - name: Install Cordova and Build App Bundle
       run: |
-        echo "--- STEP 1: Installing Cordova ---"
         npm install -g cordova
-        
-        echo "--- STEP 2: Creating Cordova Project ---"
         cordova create temp_build
         cd temp_build
         cp -r ../www/* www/
         cp ../config.xml .
-
-        echo "--- STEP 3: Adding Android Platform ---"
         cordova platform add android@11
-        
-        echo "--- STEP 4: Attempting The Build (The important part) ---"
-        # The '|| true' at the end forces the script to continue even if the build fails
-        cordova build android --release -- --minSdkVersion 22 || true
-        
-        echo "--- STEP 5: Listing All Files In The Project ---"
-        # This will show us exactly what was created, and where
-        ls -R ..
+        # The --packageType=apk flag has been REMOVED to build a bundle by default
+        cordova build android --release -- --minSdkVersion 22
+
+    - name: Upload App Bundle
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-bundle-release
+        # The path is now changed to find the .aab file
+        path: temp_build/platforms/android/app/build/outputs/bundle/release/*.aab
