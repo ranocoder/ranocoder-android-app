@@ -44,9 +44,11 @@ jobs:
         cd temp_build
         cordova build android --release -- --minSdkVersion 22
 
+    - name: List build outputs (for debugging)
+      run: find temp_build/platforms/android/app/build/outputs -type f
+
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: app-release
-        # CORRECTED to use a wildcard to find any .apk file
-        path: temp_build/platforms/android/app/build/outputs/apk/release/*.apk
+        path: temp_build/platforms/android/app/build/outputs/**/*.apk
