@@ -16,7 +16,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '17' # UPDATED to Java 17
+        java-version: '17'
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
@@ -26,7 +26,6 @@ jobs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
       with:
-        # CORRECTED to use the 'packages' input
         packages: "platforms;android-32 build-tools;32.0.0"
 
     - name: Install Cordova
@@ -48,5 +47,6 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: app-release-unsigned
-        path: temp_build/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
+        name: app-release
+        # CORRECTED to use a wildcard to find any .apk file
+        path: temp_build/platforms/android/app/build/outputs/apk/release/*.apk
