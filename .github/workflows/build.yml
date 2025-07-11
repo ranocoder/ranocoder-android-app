@@ -1,0 +1,46 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+
+    - name: Install Cordova
+      run: npm install -g cordova
+
+    - name: Create Cordova Project and Add Android Platform
+      run: |
+        cordova create temp_build
+        cd temp_build
+        cp -r ../www/* www/
+        cp ../config.xml .
+        cordova platform add android@11
+
+    - name: Build Android APK
+      run: |
+        cd temp_build
+        cordova build android --release -- --minSdkVersion 22
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-release-unsigned
+        path: temp_build/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
