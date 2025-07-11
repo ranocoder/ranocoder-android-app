@@ -23,32 +23,24 @@ jobs:
       with:
         node-version: '16'
         
-    - name: Set up Android SDK
+    - name: Set up Android SDK and Accept Licenses
       uses: android-actions/setup-android@v3
       with:
         packages: "platforms;android-32 build-tools;32.0.0"
+        accept-android-sdk-licenses: true # ADDED: This is the critical fix
 
-    - name: Install Cordova
-      run: npm install -g cordova
-
-    - name: Create Cordova Project and Add Android Platform
+    - name: Install Cordova and Build App
       run: |
+        npm install -g cordova
         cordova create temp_build
         cd temp_build
         cp -r ../www/* www/
         cp ../config.xml .
         cordova platform add android@11
-        
-    - name: Build Android APK
-      run: |
-        cd temp_build
         cordova build android --release -- --minSdkVersion 22
-
-    - name: List build outputs (for debugging)
-      run: find temp_build/platforms/android/app/build/outputs -type f
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: app-release
-        path: temp_build/platforms/android/app/build/outputs/**/*.apk
+        path: temp_build/platforms/android/app/build/outputs/apk/release/*.apk
